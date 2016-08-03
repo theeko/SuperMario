@@ -7,24 +7,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.supermario.Scenes.Hud;
 import com.mygdx.game.supermario.Sprites.Mario;
 import com.mygdx.game.supermario.SuperMario;
+import com.mygdx.game.supermario.Tools.B2WorldCreator;
 
 public class PlayScreen implements Screen {
     private SuperMario game;
@@ -66,76 +60,10 @@ public class PlayScreen implements Screen {
         world = new World(new Vector2(0,-10), true); //first gravity x,y //second sleep objs not calculated
         b2dr = new Box2DDebugRenderer();
 
+        new B2WorldCreator(world, map);
+
         player = new Mario(world);
 
-        BodyDef bdef = new BodyDef();
-        PolygonShape shape = new PolygonShape();
-        FixtureDef fdef = new FixtureDef();
-        Body body;
-
-        //ground word objs
-        for(MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() /2, rect.getY() + rect.getHeight() /2);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
-            fdef.shape = shape;
-
-            body.createFixture(fdef);
-
-        }
-
-        //pipes word objs
-        for(MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set((rect.getX() + rect.getWidth() /2)/SuperMario.PPM, (rect.getY() + rect.getHeight() /2) /SuperMario.PPM);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox((rect.getWidth()/2)/SuperMario.PPM, (rect.getHeight()/2)/SuperMario.PPM);
-            fdef.shape = shape;
-
-            body.createFixture(fdef);
-
-        }
-
-        //coins word objs
-        for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set((rect.getX() + rect.getWidth() /2)/SuperMario.PPM, (rect.getY() + rect.getHeight() /2) /SuperMario.PPM);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox((rect.getWidth()/2)/SuperMario.PPM, (rect.getHeight()/2)/SuperMario.PPM);
-            fdef.shape = shape;
-
-            body.createFixture(fdef);
-
-        }
-
-        //bricks word objs
-        for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set((rect.getX() + rect.getWidth() /2)/SuperMario.PPM, (rect.getY() + rect.getHeight() /2) /SuperMario.PPM);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox((rect.getWidth()/2)/SuperMario.PPM, (rect.getHeight()/2)/SuperMario.PPM);
-            fdef.shape = shape;
-
-            body.createFixture(fdef);
-
-        }
     }
 
 
@@ -158,10 +86,10 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
 
-        game.batch.begin();
-        game.batch.draw(leftButton, 6, 12, buttonImg.getWidth()*2/3 , buttonImg.getHeight()*2/3);
-        game.batch.draw(rightButton, 6+ buttonImg.getWidth()*2/3, 12, buttonImg.getWidth()*2/3, buttonImg.getHeight()*2/3);
-        game.batch.end();
+//        game.batch.begin();
+//        game.batch.draw(leftButton, 6, 12, buttonImg.getWidth()*2/3 , buttonImg.getHeight()*2/3);
+//        game.batch.draw(rightButton, 6+ buttonImg.getWidth()*2/3, 12, buttonImg.getWidth()*2/3, buttonImg.getHeight()*2/3);
+//        game.batch.end();
 
     }
 
@@ -179,24 +107,25 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt){
         if(Gdx.input.isTouched()){
-            if(Gdx.input.getX() <= leftButton.getRegionWidth() +6
-                    && Gdx.input.getX() >= 6
-                    && Gdx.input.getX() <= 6 + buttonImg.getWidth()*2/3
-                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
-                    && Gdx.input.getY() >= 12
-                    && player.b2body.getLinearVelocity().x >= -2){
-                player.b2body.applyLinearImpulse(new Vector2(0.1f, 0), player.b2body.getWorldCenter(), true);
-            }
-            if(Gdx.input.getX() <= rightButton.getRegionWidth() +6
-                    && Gdx.input.getX() >= 6 + buttonImg.getWidth()*2/3f
-                    && Gdx.input.getX() <= 6 + 2* buttonImg.getWidth()*2/3 + 6
-                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
-                    && Gdx.input.getY() >= 12
-                    && player.b2body.getLinearVelocity().x <= 2){
-                player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
-            } else {
-                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
-            }
+//            if(Gdx.input.getX() <= leftButton.getRegionWidth() +6
+//                    && Gdx.input.getX() >= 6
+//                    && Gdx.input.getX() <= 6 + buttonImg.getWidth()*2/3
+//                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
+//                    && Gdx.input.getY() >= 12
+//                    && player.b2body.getLinearVelocity().x >= -2){
+//                player.b2body.applyLinearImpulse(new Vector2(0.1f, 0), player.b2body.getWorldCenter(), true);
+//            }
+//            if(Gdx.input.getX() <= rightButton.getRegionWidth() +6
+//                    && Gdx.input.getX() >= 6 + buttonImg.getWidth()*2/3f
+//                    && Gdx.input.getX() <= 6 + 2* buttonImg.getWidth()*2/3 + 6
+//                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
+//                    && Gdx.input.getY() >= 12
+//                    && player.b2body.getLinearVelocity().x <= 2){
+//                player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
+//            } else {
+//                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
+//            }
+            player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
 
         }
 
@@ -224,6 +153,10 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        map.dispose();
+        tmRenderer.dispose();
+        world.dispose();
+        b2dr.dispose();
+        hud.dispose();
     }
 }
