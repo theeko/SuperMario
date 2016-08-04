@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -27,6 +28,7 @@ public class PlayScreen implements Screen {
     private Hud hud;
     private Texture buttonImg;
     private TextureRegion leftButton, rightButton;
+    private TextureAtlas atlas;
 
     private TmxMapLoader maploader;
     private TiledMap map;
@@ -39,6 +41,9 @@ public class PlayScreen implements Screen {
     private Mario player;
 
     public PlayScreen (SuperMario game){
+
+        atlas = new TextureAtlas("Mario_and_Enemies.pack");
+
         this.game = game;
         gamecam = new OrthographicCamera();
         buttonImg = new Texture(Gdx.files.internal("left-button.png"));
@@ -62,8 +67,12 @@ public class PlayScreen implements Screen {
 
         new B2WorldCreator(world, map);
 
-        player = new Mario(world);
+        player = new Mario(world, this);
 
+    }
+
+    public TextureAtlas getAtlas(){
+        return atlas;
     }
 
 
@@ -83,13 +92,13 @@ public class PlayScreen implements Screen {
         tmRenderer.render();
         b2dr.render(world, gamecam.combined);
 
+        game.batch.setProjectionMatrix(gamecam.combined);
+        game.batch.begin();
+        player.draw(game.batch);
+        game.batch.end();
+
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
-
-//        game.batch.begin();
-//        game.batch.draw(leftButton, 6, 12, buttonImg.getWidth()*2/3 , buttonImg.getHeight()*2/3);
-//        game.batch.draw(rightButton, 6+ buttonImg.getWidth()*2/3, 12, buttonImg.getWidth()*2/3, buttonImg.getHeight()*2/3);
-//        game.batch.end();
 
     }
 
@@ -98,6 +107,8 @@ public class PlayScreen implements Screen {
         handleInput(dt);
 
         world.step(1/60f, 6, 2);
+
+        player.update(dt);
 
         gamecam.position.x = player.b2body.getPosition().x;
 
