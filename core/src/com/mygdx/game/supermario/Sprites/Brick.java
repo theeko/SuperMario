@@ -3,9 +3,19 @@ package com.mygdx.game.supermario.Sprites;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.game.supermario.SuperMario;
 
 public class Brick extends InteractiveTileObject{
     public Brick(World world, TiledMap map, Rectangle bounds) {
         super(world, map, bounds);
+        fixture.setUserData(this);
+        setCategoryFilter(SuperMario.BRICK_BIT);
+    }
+
+    @Override
+    public void onHeadHit() {
+        setCategoryFilter(SuperMario.DESTROYED_BIT);
+        getCell().setTile(null);
+
     }
 }

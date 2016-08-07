@@ -20,6 +20,7 @@ import com.mygdx.game.supermario.Scenes.Hud;
 import com.mygdx.game.supermario.Sprites.Mario;
 import com.mygdx.game.supermario.SuperMario;
 import com.mygdx.game.supermario.Tools.B2WorldCreator;
+import com.mygdx.game.supermario.Tools.WorldContactListener;
 
 public class PlayScreen implements Screen {
     private SuperMario game;
@@ -54,13 +55,14 @@ public class PlayScreen implements Screen {
 
 
         gamePort = new FitViewport(SuperMario.V_WIDTH /SuperMario.PPM, SuperMario.V_HEIGHT /SuperMario.PPM, gamecam);
-        gamecam.position.set(gamePort.getWorldWidth()/2, gamePort.getWorldHeight()/2,0);
-
-        hud = new Hud(game.batch);
 
         maploader = new TmxMapLoader();
         map = maploader.load("level1.tmx");
         tmRenderer = new OrthogonalTiledMapRenderer(map, 1 /SuperMario.PPM);
+
+        gamecam.position.set(gamePort.getWorldWidth()/2, gamePort.getWorldHeight()/2,0);
+
+        hud = new Hud(game.batch, player);
 
         world = new World(new Vector2(0,-10), true); //first gravity x,y //second sleep objs not calculated
         b2dr = new Box2DDebugRenderer();
@@ -68,6 +70,8 @@ public class PlayScreen implements Screen {
         new B2WorldCreator(world, map);
 
         player = new Mario(world, this);
+
+        world.setContactListener(new WorldContactListener());
 
     }
 
@@ -118,26 +122,17 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt){
         if(Gdx.input.isTouched()){
-//            if(Gdx.input.getX() <= leftButton.getRegionWidth() +6
-//                    && Gdx.input.getX() >= 6
-//                    && Gdx.input.getX() <= 6 + buttonImg.getWidth()*2/3
-//                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
-//                    && Gdx.input.getY() >= 12
-//                    && player.b2body.getLinearVelocity().x >= -2){
-//                player.b2body.applyLinearImpulse(new Vector2(0.1f, 0), player.b2body.getWorldCenter(), true);
-//            }
-//            if(Gdx.input.getX() <= rightButton.getRegionWidth() +6
-//                    && Gdx.input.getX() >= 6 + buttonImg.getWidth()*2/3f
-//                    && Gdx.input.getX() <= 6 + 2* buttonImg.getWidth()*2/3 + 6
-//                    && Gdx.input.getY() <= buttonImg.getHeight()*2/3 +12
-//                    && Gdx.input.getY() >= 12
-//                    && player.b2body.getLinearVelocity().x <= 2){
-//                player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
-//            } else {
-//                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
-//            }
-            player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
+            if(hud.touchedRight){
+                player.b2body.applyLinearImpulse(new Vector2(0.1f, 0), player.b2body.getWorldCenter(), true);
+            }
+            else if(hud.touchedLeft){
+                player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
+            }
+            else if(player.getState() != Mario.State.JUMPING ){
+                Gdx.app.error("PlayScreen", "jump");
+                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true); //impulse immediate, force gradual
 
+            }
         }
 
     }
