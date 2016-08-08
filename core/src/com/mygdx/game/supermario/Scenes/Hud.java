@@ -31,11 +31,11 @@ public class Hud implements Disposable {
     //Mario score/time Tracking Variables
     private Integer worldTimer;
     private float timeCount;
-    private Integer score;
+    private static Integer score;
 
     //Scene2D widgets
     private Label countdownLabel;
-    private Label scoreLabel;
+    private static Label scoreLabel;
     private Label timeLabel;
     private Label levelLabel;
     private Label worldLabel;
@@ -141,6 +141,20 @@ public class Hud implements Disposable {
             }
         });
 
+    }
+
+    public void update(float dt){
+        timeCount += dt;
+        if(timeCount >=1){
+            worldTimer--;
+            countdownLabel.setText(String.format("%03d", worldTimer));
+            timeCount = 0;
+        }
+    }
+
+    public static void addScore(int val){
+        score += val;
+        scoreLabel.setText(String.format("%06d", score));
     }
 
     public void dispose() {

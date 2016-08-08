@@ -1,6 +1,7 @@
 package com.mygdx.game.supermario.Tools;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -18,8 +19,11 @@ public class WorldContactListener implements ContactListener{
             Fixture head = fixA.getUserData() == "head" ? fixA :fixB;
             Fixture object = head == fixA ? fixB : fixA;
 
+            Gdx.app.debug("worldContactLisneter", "inside of first if");
+
             if(object.getUserData() != null && InteractiveTileObject.class.isAssignableFrom(object.getUserData().getClass())){
                 ((InteractiveTileObject) object.getUserData()).onHeadHit();
+                Gdx.app.debug("worldContactLisneter", "inside of second if");
             }
         }
     }
