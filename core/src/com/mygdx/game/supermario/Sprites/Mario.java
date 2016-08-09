@@ -109,7 +109,7 @@ public class Mario extends Sprite {
     public void defineMario(){
 
         BodyDef bdef = new BodyDef();
-        bdef.position.set(220 / SuperMario.PPM, 32 / SuperMario.PPM);
+        bdef.position.set(120 / SuperMario.PPM, 32 / SuperMario.PPM);
         bdef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bdef);
 
@@ -117,7 +117,9 @@ public class Mario extends Sprite {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(16 / 2 / SuperMario.PPM, 16/2/ SuperMario.PPM);
         fdef.filter.categoryBits = SuperMario.MARIO_BIT;
-        fdef.filter.maskBits = SuperMario.DEFAULT_BIT | SuperMario.COIN_BIT | SuperMario.BRICK_BIT;
+        fdef.filter.maskBits = SuperMario.GROUND_BIT | SuperMario.COIN_BIT
+                | SuperMario.BRICK_BIT | SuperMario.ENEMY_BIT
+                | SuperMario.OBJECT_BIT | SuperMario.ENEMY_HEAD_BIT;
 
         fdef.shape = shape;
         b2body.createFixture(fdef);

@@ -9,12 +9,18 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.supermario.Screens.PlayScreen;
-import com.mygdx.game.supermario.Sprites.Brick;
-import com.mygdx.game.supermario.Sprites.Coin;
+import com.mygdx.game.supermario.Sprites.TileObjects.Brick;
+import com.mygdx.game.supermario.Sprites.TileObjects.Coin;
+import com.mygdx.game.supermario.Sprites.Enemies.Goomba;
 import com.mygdx.game.supermario.SuperMario;
 
 public class B2WorldCreator {
+
+
+    private Array<Goomba> goombas;
+
     public B2WorldCreator(PlayScreen screen){
 
         World world = screen.getWorld();
@@ -37,6 +43,7 @@ public class B2WorldCreator {
 
             shape.setAsBox(rect.getWidth() / 2 / SuperMario.PPM, rect.getHeight() / 2 / SuperMario.PPM);
             fdef.shape = shape;
+            fdef.filter.categoryBits = SuperMario.GROUND_BIT;
             body.createFixture(fdef);
         }
 
@@ -51,6 +58,7 @@ public class B2WorldCreator {
 
             shape.setAsBox(rect.getWidth() / 2 / SuperMario.PPM, rect.getHeight() / 2 / SuperMario.PPM);
             fdef.shape = shape;
+            fdef.filter.categoryBits = SuperMario.OBJECT_BIT;
             body.createFixture(fdef);
         }
 
@@ -68,5 +76,16 @@ public class B2WorldCreator {
             new Coin(screen, rect);
 
         }
+
+        //goombas
+        goombas = new Array<Goomba>();
+        for(MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)){
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            goombas.add(new Goomba(screen, rect.getX() / SuperMario.PPM, rect.getY() / SuperMario.PPM));
+        }
+    }
+
+    public Array<Goomba> getGoombas() {
+        return goombas;
     }
 }

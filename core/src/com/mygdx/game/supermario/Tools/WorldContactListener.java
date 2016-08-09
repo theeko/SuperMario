@@ -7,13 +7,21 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.mygdx.game.supermario.Sprites.InteractiveTileObject;
+import com.mygdx.game.supermario.Sprites.Enemies.Enemy;
+import com.mygdx.game.supermario.Sprites.TileObjects.InteractiveTileObject;
+import com.mygdx.game.supermario.SuperMario;
 
 public class WorldContactListener implements ContactListener{
     @Override
     public void beginContact(Contact contact) {
         Fixture fixA = contact.getFixtureA();
         Fixture fixB = contact.getFixtureB();
+
+        int collisionDefination = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
+
+        Gdx.app.debug("worldContactLisneter", "inside of first if");
+        Gdx.app.debug("worldContactLisneter", "inside of first if");
+        Gdx.app.debug("worldContactLisneter", "inside of first if");
 
         if(fixA.getUserData() == "head" || fixB.getUserData() == "head"){
             Fixture head = fixA.getUserData() == "head" ? fixA :fixB;
@@ -25,6 +33,29 @@ public class WorldContactListener implements ContactListener{
                 ((InteractiveTileObject) object.getUserData()).onHeadHit();
                 Gdx.app.debug("worldContactLisneter", "inside of second if");
             }
+        }
+
+        switch (collisionDefination){
+            case SuperMario.ENEMY_HEAD_BIT | SuperMario.MARIO_BIT:
+                if(fixA.getFilterData().categoryBits == SuperMario.ENEMY_HEAD_BIT){
+                    ((Enemy)fixA.getUserData()).hitOnHead();
+                } else {
+                ((Enemy)fixB.getUserData()).hitOnHead(); }
+                break;
+            case SuperMario.ENEMY_BIT | SuperMario.OBJECT_BIT:
+                if(fixA.getFilterData().categoryBits == SuperMario.ENEMY_BIT){
+                    ((Enemy)fixA.getUserData()).reverseVelocity(true, false);
+                } else {
+                    ((Enemy)fixB.getUserData()).reverseVelocity(true, false); }
+                break;
+            case SuperMario.ENEMY_BIT | SuperMario.ENEMY_BIT:
+                    ((Enemy)fixA.getUserData()).reverseVelocity(true, false);
+                    ((Enemy)fixB.getUserData()).reverseVelocity(true, false);
+                break;
+            case SuperMario.MARIO_BIT | SuperMario.ENEMY_BIT:
+                Gdx.app.debug("mario", "goomba mario contact");
+                break;
+
         }
     }
 

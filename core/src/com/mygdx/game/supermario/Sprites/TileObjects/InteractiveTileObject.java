@@ -1,4 +1,4 @@
-package com.mygdx.game.supermario.Sprites;
+package com.mygdx.game.supermario.Sprites.TileObjects;
 
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
