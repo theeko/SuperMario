@@ -5,6 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.supermario.Items.ItemDef;
+import com.mygdx.game.supermario.Items.Mushroom;
 import com.mygdx.game.supermario.Scenes.Hud;
 import com.mygdx.game.supermario.Screens.PlayScreen;
 import com.mygdx.game.supermario.SuperMario;
@@ -27,7 +30,13 @@ public class Coin extends InteractiveTileObject{
         if(getCell().getTile().getId() == BLANK_COIN){
             SuperMario.manager.get("audio/sounds/bump.wav", Sound.class).play();
         } else {
+            Gdx.app.error("coin", "onhead else block");
+            Gdx.app.error("coin", "onhead else block");
+            Gdx.app.error("coin", "onhead else block");
+            Gdx.app.error("coin", "onhead else block");
             SuperMario.manager.get("audio/sounds/coin.wav", Sound.class).play();
+            screen.spawnItem(new ItemDef(new Vector2(body.getPosition().x, body.getPosition().y + 16 / SuperMario.PPM),
+                    Mushroom.class));
         }
         getCell().setTile(tileSet.getTile(BLANK_COIN));
         Hud.addScore(100);

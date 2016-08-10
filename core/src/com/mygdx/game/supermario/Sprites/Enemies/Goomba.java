@@ -66,7 +66,7 @@ public class Goomba extends Enemy {
 
     public void  defineEnemy(){
         BodyDef bdef = new BodyDef();
-        bdef.position.set(220 / SuperMario.PPM, 32 / SuperMario.PPM);
+        bdef.position.set(getX(), getY());
         bdef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bdef);
 
