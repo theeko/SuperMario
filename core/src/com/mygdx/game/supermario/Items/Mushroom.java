@@ -3,9 +3,10 @@ package com.mygdx.game.supermario.Items;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.mygdx.game.supermario.Screens.PlayScreen;
+import com.mygdx.game.supermario.Sprites.Mario;
 import com.mygdx.game.supermario.SuperMario;
 
 public class Mushroom extends Item{
@@ -24,20 +25,20 @@ public class Mushroom extends Item{
         body = world.createBody(bdef);
 
         FixtureDef fdef = new FixtureDef();
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(16 / 2 / SuperMario.PPM, 16/2/ SuperMario.PPM);
-        fdef.filter.categoryBits = SuperMario.ENEMY_BIT;
+        CircleShape shape = new CircleShape();
+        shape.setRadius(6 / SuperMario.PPM);
+        fdef.filter.categoryBits = SuperMario.ITEM_BIT;
         fdef.filter.maskBits = SuperMario.GROUND_BIT | SuperMario.COIN_BIT |
-                SuperMario.BRICK_BIT | SuperMario.ENEMY_BIT
-                | SuperMario.OBJECT_BIT | SuperMario.MARIO_BIT;
+                SuperMario.BRICK_BIT |  SuperMario.OBJECT_BIT | SuperMario.MARIO_BIT;
 
         fdef.shape = shape;
         body.createFixture(fdef).setUserData(this);
     }
 
     @Override
-    public void use() {
+    public void use(Mario mario) {
         destroy();
+        mario.grow();
     }
 
     public void update(float dt) {
@@ -46,4 +47,5 @@ public class Mushroom extends Item{
         velocity.y = body.getLinearVelocity().y;
         body.setLinearVelocity(velocity);
     }
+
 }

@@ -11,15 +11,18 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.supermario.Screens.PlayScreen;
+import com.mygdx.game.supermario.Sprites.Enemies.Enemy;
+import com.mygdx.game.supermario.Sprites.Enemies.Goomba;
+import com.mygdx.game.supermario.Sprites.Enemies.Turtle;
 import com.mygdx.game.supermario.Sprites.TileObjects.Brick;
 import com.mygdx.game.supermario.Sprites.TileObjects.Coin;
-import com.mygdx.game.supermario.Sprites.Enemies.Goomba;
 import com.mygdx.game.supermario.SuperMario;
 
 public class B2WorldCreator {
 
 
     private Array<Goomba> goombas;
+    private Array<Turtle> turtles;
 
     public B2WorldCreator(PlayScreen screen){
 
@@ -64,16 +67,12 @@ public class B2WorldCreator {
 
         //create brick bodies/fixtures
         for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            new Brick(screen, rect);
+            new Brick(screen, object);
         }
 
         //create coin bodies/fixtures
         for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            new Coin(screen, rect);
+            new Coin(screen, object);
 
         }
 
@@ -83,9 +82,23 @@ public class B2WorldCreator {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
             goombas.add(new Goomba(screen, rect.getX() / SuperMario.PPM, rect.getY() / SuperMario.PPM));
         }
+
+        //turtles
+        turtles = new Array<Turtle>();
+        for(MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)){
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            turtles.add(new Turtle(screen, rect.getX() / SuperMario.PPM, rect.getY() / SuperMario.PPM));
+        }
     }
 
     public Array<Goomba> getGoombas() {
         return goombas;
+    }
+
+    public Array<Enemy> getEnemies(){
+        Array<Enemy> enemies = new Array<Enemy>();
+        enemies.addAll(goombas);
+        enemies.addAll(turtles);
+        return enemies;
     }
 }
